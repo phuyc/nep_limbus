@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "better-sqlite3": "^7.6.2",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.1",
+    "node-fetch": "^2.6.7",
+    "string-similarity": "^4.0.4"
+  }
+}

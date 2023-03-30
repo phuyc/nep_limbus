@@ -17,37 +17,6 @@ async function identityEmbed(slug) {
 
     aff = json.affinityDetailed;
 
-    skills = json.skills;
-    skillDesc = '';
-    skills.forEach(skill => {
-        // Title
-        skillDesc += `${AFFINITIES[skill.type]} **${skill.name.toUpperCase()}**\n`
-        
-        // Start block
-        skillDesc += '```ini\n';
-
-        // Details
-        skillDesc += `Attack Type: [${skill.attackType}] ${' '.repeat(7 - skill.attackType.length)} Skill Power: [${skill.skillPower}]\n`
-                   + `No of Coins: [${skill.numberOfCoins}] ${' '.repeat(7 - skill.numberOfCoins.length)} Coin Power:  [${skill.coinPower}]\n`
-                   + `Offense Lvl: [${skill.offenseLevel}] ${' '.repeat(7 - skill.offenseLevel.length)} Growth:      [${skill.growth}]\n`
-
-        // Skill Effect
-        if (skill.skillEffect) {
-            skillEffect = JSON.parse(skill.skillEffect.raw);
-            skillDesc += `${skillEffect.content[0].content[0].value} ${skillEffect.content[0].content[1] ? skillEffect.content[0].content[1].value : ''}\n`
-        }
-
-        // Coin Effect
-        if (skill.coinEffect) {
-            Object.values(skill.coinEffect).filter(effect => effect).forEach((effect, index) => {
-                index % 2 == 0 ? skillDesc += `[${effect}] ` : skillDesc += `${effect.replace(/<b>/g, "").replace(/<\/b>/g, "").replace(/ <br \/> /g, "\n")}\n` 
-            }); 
-        }
-
-        // End block
-        skillDesc += '```\n';
-    });
-
     passiveDesc = '';
     // Passive
     json.passives.forEach(passive => {
@@ -96,14 +65,48 @@ async function identityEmbed(slug) {
                      + `\n<:attackt_blunt:1087400340728578078> **Blunt RES**: ${json.resistances.blunt}`,
                 inline: true,
             },
-            
-            // Field 4 (Skills)
-            { name: 'SKILLS', value: skillDesc },
-
-            // Field 5 (Passives)
-            { name: 'PASSIVES', value: passiveDesc },
         );
 
+    // Skills
+    skills = json.skills;
+    skills.forEach((skill, index) => {
+
+        // Reset skillDesc
+        skillDesc = '';
+        
+        // Title
+        skillDesc += `${AFFINITIES[skill.type]} **${skill.name.toUpperCase()}**\n`
+        
+        // Start block
+        skillDesc += '```ini\n';
+
+        // Details
+        skillDesc += `Attack Type: [${skill.attackType}] ${' '.repeat(7 - skill.attackType.length)} Skill Power: [${skill.skillPower}]\n`
+                   + `No of Coins: [${skill.numberOfCoins}] ${' '.repeat(7 - skill.numberOfCoins.length)} Coin Power:  [${skill.coinPower}]\n`
+                   + `Offense Lvl: [${skill.offenseLevel}] ${' '.repeat(7 - skill.offenseLevel.length)} Growth:      [${skill.growth}]\n`
+
+        // Skill Effect
+        if (skill.skillEffect) {
+            skillEffect = JSON.parse(skill.skillEffect.raw);
+            skillDesc += `${skillEffect.content[0].content[0].value} ${skillEffect.content[0].content[1] ? skillEffect.content[0].content[1].value : ''}\n`;
+        }
+
+        // Coin Effect
+        if (skill.coinEffect) {
+            Object.values(skill.coinEffect).filter(effect => effect).forEach((effect, index) => {
+                index % 2 == 0 ? skillDesc += `[${effect}] ` : skillDesc += `${effect.replace(/<b>/g, "").replace(/<\/b>/g, "").replace(/ <br \/> /g, "\n")}\n`;
+            }); 
+        }
+
+        // End block
+        skillDesc += '```\n';
+
+        // * Field 4.index (Skills)
+        embed.addFields({ name: index === 0 ? 'SKILLS' : '\u200b', value: skillDesc });
+    });
+
+    // * Field 5 (PASSIVES)
+    embed.addFields({ name: 'PASSIVES', value: passiveDesc })
 
     return embed;
 }
